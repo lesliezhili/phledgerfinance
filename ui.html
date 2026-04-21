@@ -140,6 +140,8 @@
       <h2>Bank Feeds</h2>
       <button class="upload-btn" id="upload-anz">Upload ANZ CSV</button>
       <button class="upload-btn" id="upload-rbc">Upload RBC CSV</button>
+      <button class="upload-btn" id="download-anz">Auto-Download ANZ</button>
+      <button class="upload-btn" id="download-rbc">Auto-Download RBC</button>
       <button class="upload-btn" id="view-tx">View Transactions</button>
       <button class="upload-btn" id="view-analytics">View Analytics</button>
       <div class="drop-zone" id="drop-zone">Drop CSV here or click to browse</div>
@@ -169,6 +171,8 @@
     const sendEl = document.getElementById("send");
     const uploadAnzEl = document.getElementById("upload-anz");
     const uploadRbcEl = document.getElementById("upload-rbc");
+    const downloadAnzEl = document.getElementById("download-anz");
+    const downloadRbcEl = document.getElementById("download-rbc");
     const viewTxEl = document.getElementById("view-tx");
     const viewAnalyticsEl = document.getElementById("view-analytics");
     const dropZoneEl = document.getElementById("drop-zone");
@@ -280,6 +284,40 @@
         if (file) uploadFile(file, "rbc");
       };
       input.click();
+    });
+
+    downloadAnzEl.addEventListener("click", async () => {
+      const formData = new FormData();
+      formData.append("bank", "anz");
+      formData.append("days", 30);
+      try {
+        const res = await fetch("/download-bank", { method: "POST", body: formData });
+        if (!res.ok) {
+          addMessage("Download error: " + res.status + " " + res.statusText, "agent");
+        } else {
+          const data = await res.json();
+          addMessage(data.message || data.error, "agent");
+        }
+      } catch (e) {
+        addMessage("Download error: " + e.message, "agent");
+      }
+    });
+
+    downloadRbcEl.addEventListener("click", async () => {
+      const formData = new FormData();
+      formData.append("bank", "rbc");
+      formData.append("days", 30);
+      try {
+        const res = await fetch("/download-bank", { method: "POST", body: formData });
+        if (!res.ok) {
+          addMessage("Download error: " + res.status + " " + res.statusText, "agent");
+        } else {
+          const data = await res.json();
+          addMessage(data.message || data.error, "agent");
+        }
+      } catch (e) {
+        addMessage("Download error: " + e.message, "agent");
+      }
     });
 
     viewTxEl.addEventListener("click", viewTransactions);

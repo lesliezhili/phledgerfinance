@@ -2,10 +2,14 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import HTMLResponse
 from models import ChatRequest, ChatResponse, Transaction
 from chat_agent import PHLedgerAgent
+from connectors.bank_downloader import BankDownloader
 from pathlib import Path
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(title="PHLedger Working Agent")
 agent = PHLedgerAgent()
@@ -83,3 +87,41 @@ def get_analytics():
         "total_expenses": round(expenses, 2),
         "net": round(income - expenses, 2)
     }
+
+@app.post("/download-bank")
+def download_bank_csv(bank: str = Form(...), days: int = Form(30)):
+    """
+    Automatically download bank CSV from ANZ or RBC.
+    
+    Requires environment variables:
+    - ANZ_USERNAME, ANZ_PASSWORD (for ANZ)
+    - RBC_USERNAME, RBC_PASSWORD (for RBC)
+    
+    Args:
+        bank: "anz" or "rbc"
+        days: Number of days back to download (default 30)
+    
+    WARNING: Requires valid credentials. Use at your own risk.
+    """
+    try:
+        downloader = BankDownloader(bank)
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=days)
+        
+        # Download to temporary folder
+        download_dir = Path(__file__).parent / "bank_downloads" / bank
+        downloader.download_csv(start_date, end_date, download_dir)
+        
+        return {
+            "status": "success",
+            "bank": bank,
+            "message": f"Downloaded {bank.upper()} transactions for last {days} days",
+            "download_dir": str(download_dir)
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "bank": bank,
+            "error": str(e),
+            "message": "Failed to download. Ensure credentials are set as environment variables."
+        }

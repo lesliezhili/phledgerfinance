@@ -41,7 +41,47 @@ Use the UI to upload ANZ/RBC CSVs. They are auto-routed to correct folders based
 
 In chat: "migrate", "bas", "au company", "au personal", "ca corporate", "ca personal", "p&l"
 
-## Deployment
+## Automated Bank Downloads
+
+### Setup Credentials
+
+To use automated ANZ/RBC downloads, set environment variables:
+
+```bash
+export ANZ_USERNAME="your-anz-username"
+export ANZ_PASSWORD="your-anz-password"
+
+export RBC_USERNAME="your-rbc-username"
+export RBC_PASSWORD="your-rbc-password"
+```
+
+### Usage
+
+**Via UI**: Click "Auto-Download ANZ" or "Auto-Download RBC" in the Bank Feeds panel.
+
+**Via API**:
+```bash
+curl -X POST http://localhost:8000/download-bank \
+  -F "bank=anz" \
+  -F "days=30"
+```
+
+### Warning
+
+Automating bank logins may violate the bank's terms of service. Use at your own risk. Downloaded CSVs are saved to `bank_downloads/` folder and auto-ingested.
+
+### Limitations
+
+- Some banks may block automated logins
+- 2FA may require manual intervention
+- HTML element selectors may change if banks update their UI
+
+### Alternative
+
+Instead of automated downloads, you can:
+1. Manually download CSV from your bank website
+2. Use the "Upload" button in the UI
+3. The CSV is auto-routed to the correct folder based on transaction dates
 
 ### Docker
 
