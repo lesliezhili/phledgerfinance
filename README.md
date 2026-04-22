@@ -41,6 +41,46 @@ Use the UI to upload ANZ/RBC CSVs. They are auto-routed to correct folders based
 
 In chat: "migrate", "bas", "au company", "au personal", "ca corporate", "ca personal", "p&l"
 
+## Xero Integration
+
+PHLedgerTax supports real Xero API integration for fetching historical ANZ data.
+
+### Setup Xero API
+
+1. Create a Xero app at https://developer.xero.com/
+2. Get Client ID, Client Secret
+3. Obtain Access Token (use OAuth2 flow or Xero's token tool)
+4. Get Tenant ID from your Xero organization
+
+Set environment variables:
+
+```bash
+export XERO_CLIENT_ID="your-client-id"
+export XERO_CLIENT_SECRET="your-client-secret"
+export XERO_ACCESS_TOKEN="your-access-token"
+export XERO_TENANT_ID="your-tenant-id"
+```
+
+### Usage
+
+- "migrate" command fetches historical data from Xero and saves to CSV folders
+- Data is fetched as bank transactions
+
+### Tax Reports
+
+New chat commands:
+
+- "quarterly gst" - Generates quarterly GST report for CA
+- "annual tax au personal" - Annual AU personal tax return
+- "annual tax au company" - Annual AU company tax return
+- "annual tax ca personal" - Annual CA personal tax return
+- "annual tax ca company" - Annual CA company tax return
+- "financial statements" - Real-time balance sheet, P&L, cash flow
+
+### API Endpoints
+
+- `/financial-statements` - JSON financial statements
+
 ## Automated Bank Downloads
 
 ### Setup Credentials

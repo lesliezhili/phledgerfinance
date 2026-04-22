@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse
 from models import ChatRequest, ChatResponse, Transaction
 from chat_agent import PHLedgerAgent
 from connectors.bank_downloader import BankDownloader
+from logic.financial_statements import generate_financial_statements
 from pathlib import Path
 import csv
 from datetime import datetime, timedelta
@@ -87,6 +88,18 @@ def get_analytics():
         "total_expenses": round(expenses, 2),
         "net": round(income - expenses, 2)
     }
+
+@app.get("/financial-statements")
+def get_financial_statements():
+    """
+    Get real-time financial statements.
+    """
+    from datetime import date
+    anz = agent.ingestor.load_bank("anz")
+    rbc = agent.ingestor.load_bank("rbc")
+    all_tx = anz + rbc
+    fs = generate_financial_statements(date.today(), all_tx)
+    return fs.model_dump()
 
 @app.post("/download-bank")
 def download_bank_csv(bank: str = Form(...), days: int = Form(30)):

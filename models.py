@@ -56,6 +56,45 @@ class TaxDraftCAPersonal(BaseModel):
     total_tax: float
     notes: List[str]
 
+class QuarterlyGST(BaseModel):
+    quarter: int
+    year: int
+    gst_collected: float
+    gst_paid: float
+    net_gst: float
+    notes: List[str]
+
+class AnnualTaxAU(BaseModel):
+    year: int
+    type: Literal["personal", "company"]
+    taxable_income: float
+    tax_payable: float
+    medicare_levy: Optional[float] = None
+    notes: List[str]
+
+class AnnualTaxCA(BaseModel):
+    year: int
+    type: Literal["personal", "company"]
+    taxable_income: float
+    federal_tax: float
+    provincial_tax: float
+    total_tax: float
+    notes: List[str]
+
+class FinancialStatements(BaseModel):
+    as_of_date: date
+    balance_sheet: dict
+    profit_loss: dict
+    cash_flow: dict
+
+class TaxDraftCAPersonal(BaseModel):
+    year: int
+    taxable_income: float
+    federal_tax: float
+    provincial_tax: float
+    total_tax: float
+    notes: List[str]
+
 class ChatRequest(BaseModel):
     message: str
 
