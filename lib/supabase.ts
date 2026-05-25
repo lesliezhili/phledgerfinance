@@ -74,5 +74,5 @@ export async function logMigration(stats: {
 }): Promise<void> {
   const client = getSupabaseClient();
   if (!client) return;
-  await client.from('migration_log').insert(stats);
+  await client.from('migration_log').insert(stats as any);
 }
