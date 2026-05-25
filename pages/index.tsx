@@ -283,32 +283,35 @@ export default function PHLedger() {
           ))}
         </div>
         <div className="sb-bot">
-          <div className="d-flex gap-2 flex-wrap">
-            <span className="sb-badge">{health.backend||'csv'}</span>
-            <span className="sb-badge" style={{color:health.status==='ok'?'#4DD9EC':'#EF4444'}}>{health.status==='ok'?'● online':'○ offline'}</span>
+          <div className="d-flex gap-2 flex-wrap align-items-center">
+            <span className="sb-badge" style={{textTransform:'uppercase'}}>{health.backend||'csv'}</span>
+            <span className="sb-badge" style={{color:health.status==='ok'?'#4ade80':'#f87171',letterSpacing:0}}>
+              {health.status==='ok'?'● live':'○ offline'}
+            </span>
           </div>
-          <div style={{fontSize:'.68rem',color:'rgba(255,255,255,.25)',marginTop:6}}>v{health.version||'2.0.0'} — PHLedger</div>
+          <div style={{fontSize:'.62rem',color:'rgba(255,255,255,.2)',marginTop:5,letterSpacing:'.3px'}}>v{health.version||'2.0'}</div>
         </div>
       </nav>
 
       {/* MAIN */}
       <div className="main">
         <div className="topbar">
-          <div>
+          <div className="topbar-left">
             <div className="topbar-t">{PAGE_TITLES[pg]||'PHLedger'}</div>
             <div className="topbar-s">{PAGE_SUBS[pg]||''}</div>
           </div>
-          <div className="d-flex align-items-center gap-3">
+          <div className="topbar-right">
             <div className="btn-group btn-group-sm">
-              {[['AU','ct-au'],['CA','ct-ca'],['ALL','ct-all']].map(([c,cls])=>(
-                <button key={c} className={`btn btn-outline-secondary${ctry===c?' '+cls:''}`} style={{fontSize:'.78rem',fontWeight:600}}
+              {[['AU','ct-au','🇦🇺'],['CA','ct-ca','🇨🇦'],['ALL','ct-all','🌐']].map(([c,cls,flag])=>(
+                <button key={c} className={`btn btn-outline-secondary${ctry===c?' '+cls:''}`}
+                  style={{fontSize:'.75rem',fontWeight:600,padding:'4px 10px'}}
                   onClick={()=>{ setCtry(c); setTimeout(refresh,50); }}>
-                  {c==='AU'?'🇦🇺 AU':c==='CA'?'🇨🇦 CA':'ALL'}
+                  {flag} {c}
                 </button>
               ))}
             </div>
-            <button className="btn btn-sm" style={{background:'var(--pr)',color:'#fff'}} onClick={()=>go('bank')}>
-              <i className="bi bi-upload me-1"/>Upload CSV
+            <button className="btn-x pri" onClick={()=>go('bank')}>
+              <i className="bi bi-upload"/>Upload CSV
             </button>
           </div>
         </div>
@@ -318,6 +321,13 @@ export default function PHLedger() {
           {/* ── DASHBOARD ── */}
           {pg==='dash' && (
             <div>
+              {/* Xero-style summary strip */}
+              <div className="stat-strip mb-4">
+                <div className="ss-item"><div className="ss-val pos">${fmt(an.total_income)}</div><div className="ss-lbl">Total Income</div></div>
+                <div className="ss-item"><div className="ss-val neg">${fmt(an.total_expenses)}</div><div className="ss-lbl">Total Expenses</div></div>
+                <div className="ss-item"><div className={`ss-val ${(an.net||0)>=0?'pos':'neg'}`}>${fmt(an.net)}</div><div className="ss-lbl">Net Profit</div></div>
+                <div className="ss-item"><div className="ss-val">{(an.total_transactions||0).toLocaleString()}</div><div className="ss-lbl">Transactions</div></div>
+              </div>
               <div className="row g-3 mb-4">
                 {[
                   ['inc','arrow-up-circle','Total Income',fmt(an.total_income),ctry!=='ALL'?ctry:'Combined'],
@@ -429,9 +439,9 @@ export default function PHLedger() {
                           onDragLeave={()=>setDrag(false)}
                           onDrop={e=>handleDrop(e,side)}
                           onClick={()=>ref.current?.click()}>
-                          <i className="bi bi-cloud-upload d-block mb-2"/>
-                          <div className="fw-semibold" style={{fontSize:'.88rem'}}>Drag &amp; drop or click to browse</div>
-                          <div className="text-muted mt-1" style={{fontSize:'.76rem'}}>CSV export from your bank</div>
+                          <i className="bi bi-cloud-arrow-up"/>
+                          <span className="uz-title">Drag &amp; drop or click to browse</span>
+                          <span className="uz-sub">Supports ANZ, NAB, CBA, Westpac, RBC, TD, BMO, Scotiabank, CIBC</span>
                           <input type="file" ref={ref} className="d-none" accept=".csv" onChange={(e: ChangeEvent<HTMLInputElement>) => handleUpload(e, sel, side)}/>
                         </div>
                         {res && <div className="mt-3 p-3 rounded" style={{background:side==='AU'?'#F0FDF4':'#FFF1F2',border:`1px solid ${side==='AU'?'#BBF7D0':'#FECDD3'}`,fontSize:'.8rem'}}>
@@ -597,7 +607,7 @@ export default function PHLedger() {
                 </div>
                 <div className="d-flex gap-2 mt-3">
                   <input className="form-control" placeholder="Try: 'au p&l', 'bas', 'status', 'help'" value={ci} onChange={(e: ChangeEvent<HTMLInputElement>) => setCi(e.target.value)} onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && sendChat()}/>
-                  <button className="btn px-3" style={{background:'var(--pr)',color:'#fff'}} onClick={sendChat} disabled={cloading}>
+                  <button className="btn-x pri px-4" onClick={sendChat} disabled={cloading}>
                     {cloading ? <span className="spinner-border" style={{width:'1rem',height:'1rem'}}/> : <i className="bi bi-send-fill"/>}
                   </button>
                 </div>
@@ -617,19 +627,22 @@ export default function PHLedger() {
               <div className="cs-b">
                 <p className="text-muted" style={{fontSize:'.875rem'}}>Ingest all historical CSVs from <code>bank_data/</code>, auto-categorise, and generate summary reports.</p>
                 <div className="d-flex gap-2 mb-3 flex-wrap">
-                  <button className="btn btn-sm" style={{background:'var(--pr)',color:'#fff'}} onClick={()=>runMigration(false)} disabled={migR}>
-                    {migR ? <><span className="spinner-border" style={{width:'.85rem',height:'.85rem'}}/> Running...</> : <><i className="bi bi-play-fill me-1"/>Run Migration</>}
+                  <button className="btn-x pri" onClick={()=>runMigration(false)} disabled={migR}>
+                    {migR ? <><span className="spinner-border" style={{width:'.8rem',height:'.8rem',borderWidth:'2px'}}/>&nbsp;Running...</> : <><i className="bi bi-play-fill"/>Run Migration</>}
                   </button>
-                  <button className="btn btn-sm btn-outline-danger" onClick={()=>runMigration(true)} disabled={migR}>Reset &amp; Rerun</button>
+                  <button className="btn-x sec" onClick={()=>runMigration(true)} disabled={migR}><i className="bi bi-arrow-counterclockwise"/>Reset &amp; Rerun</button>
                 </div>
                 {migD && migD.total_transactions > 0 && (
-                  <div className="p-3 rounded" style={{background:'#F0FDF4',border:'1px solid #BBF7D0',fontSize:'.82rem'}}>
-                    <strong><i className="bi bi-check-circle-fill text-success me-1"/>Migration complete</strong>
-                    <div className="mt-2 row g-1">
-                      <div className="col-6">Total: <strong>{migD.total_transactions}</strong></div>
-                      <div className="col-6">From: <strong>{migD.date_range?.from} → {migD.date_range?.to}</strong></div>
-                      <div className="col-12">AU: <strong>${fmt(migD.total_income_aud)}</strong> income / <strong className="text-danger">${fmt(migD.total_expenses_aud)}</strong> expenses</div>
+                  <div style={{background:'var(--success-lt)',border:'1px solid #a7f3d0',borderRadius:'var(--radius)',padding:'14px 16px',fontSize:'.82rem'}}>
+                    <div style={{fontWeight:700,color:'var(--success)',marginBottom:10,display:'flex',alignItems:'center',gap:6}}>
+                      <i className="bi bi-check-circle-fill"/>&nbsp;Migration complete
                     </div>
+                    <div className="stat-strip" style={{marginBottom:10}}>
+                      <div className="ss-item"><div className="ss-val">{migD.total_transactions?.toLocaleString()}</div><div className="ss-lbl">Transactions</div></div>
+                      <div className="ss-item"><div className="ss-val" style={{color:'var(--au)'}}>${fmt(migD.total_income_aud)}</div><div className="ss-lbl">AU Income</div></div>
+                      <div className="ss-item"><div className="ss-val" style={{color:'var(--danger)'}}>${fmt(migD.total_expenses_aud)}</div><div className="ss-lbl">AU Expenses</div></div>
+                    </div>
+                    <div style={{color:'var(--tx-3)',fontSize:'.75rem'}}>Period: {migD.date_range?.from} → {migD.date_range?.to}</div>
                   </div>
                 )}
               </div>
