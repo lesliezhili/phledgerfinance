@@ -1,9 +1,14 @@
+# Application
 fastapi
 uvicorn[standard]
 pydantic
 python-multipart
+supabase
+
+# Testing
 pytest
+pytest-cov
 httpx
-selenium
-webdriver-manager
-xero-python
+
+# Linting
+ruff
