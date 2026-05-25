@@ -305,6 +305,9 @@ export default function PHLedger() {
         setMsgs(ms=>[...ms,{role:'bot',text:'Starting migration...'}]);
         await runMigration();
         setMsgs(ms=>[...ms,{role:'bot',text:'✅ Migration complete! Check the Migrate tab for details.'}]);
+      } else if (d.action === 'kpi_report' || d.action === 'kpi_targets') {
+        go('kpi');
+        setMsgs(ms=>[...ms,{role:'bot',text:'KPI report page opened.'}]);
       } else if (d.action === 'sync_supabase') {
         setMsgs(ms=>[...ms,{role:'bot',text:'Uploading to Supabase...'}]);
         try {
@@ -928,6 +931,165 @@ export default function PHLedger() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ── KPI REPORT ── */}
+          {pg==='kpi' && (
+            <div>
+              {kpiLoading && (
+                <div className="d-flex align-items-center gap-2 mb-3" style={{color:'var(--tx-3)',fontSize:'.82rem'}}>
+                  <span className="spinner-border" style={{width:'.9rem',height:'.9rem',borderWidth:'2px'}}/> Loading KPI data...
+                </div>
+              )}
+
+              {/* Summary strip */}
+              {kpiData.scorecard && (
+                <div className="stat-strip mb-4">
+                  <div className="ss-item">
+                    <div className="ss-val pos">{kpiData.scorecard.summary?.on_track}</div>
+                    <div className="ss-lbl">On Track</div>
+                  </div>
+                  <div className="ss-item">
+                    <div className="ss-val" style={{color:'var(--warning)'}}>{kpiData.scorecard.summary?.at_risk}</div>
+                    <div className="ss-lbl">At Risk</div>
+                  </div>
+                  <div className="ss-item">
+                    <div className="ss-val neg">{kpiData.scorecard.summary?.off_track}</div>
+                    <div className="ss-lbl">Off Track</div>
+                  </div>
+                  <div className="ss-item">
+                    <div className="ss-val" style={{color:'var(--tx-4)'}}>{kpiData.scorecard.summary?.no_target}</div>
+                    <div className="ss-lbl">No Target</div>
+                  </div>
+                  <div className="ss-item">
+                    <div className="ss-val">{kpiData.metadata?.booking_count||0}</div>
+                    <div className="ss-lbl">SC Bookings</div>
+                  </div>
+                  <div className="ss-item">
+                    <div className="ss-val">{kpiData.metadata?.transaction_count||0}</div>
+                    <div className="ss-lbl">Transactions</div>
+                  </div>
+                </div>
+              )}
+
+              {/* KPI cards by category */}
+              {kpiData.scorecard?.cards ? (
+                ['SC Platform','Financial','Operational'].map(cat => {
+                  const catCards = kpiData.scorecard.cards.filter((c: any) => c.category === cat);
+                  if (!catCards.length) return null;
+                  return (
+                    <div key={cat} className="cs mb-4">
+                      <div className="cs-h">
+                        <h6>
+                          <i className={`bi bi-${cat==='SC Platform'?'heart-pulse':cat==='Financial'?'bar-chart-line':'gear'}`}/>
+                          &nbsp;{cat}
+                        </h6>
+                        <span className="pill neu">{catCards.length} KPIs</span>
+                      </div>
+                      <div className="cs-b" style={{padding:0}}>
+                        <table className="tx-tbl">
+                          <thead>
+                            <tr>
+                              <th style={{width:28}}>ID</th>
+                              <th>KPI Name</th>
+                              <th>Actual</th>
+                              <th>Target</th>
+                              <th>Variance</th>
+                              <th>Status</th>
+                              <th>Set Target</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {catCards.map((card: any) => {
+                              const statusColor = card.status==='ON_TRACK'?'var(--au)':card.status==='AT_RISK'?'var(--warning)':card.status==='OFF_TRACK'?'var(--danger)':'var(--tx-4)';
+                              const statusPill  = card.status==='ON_TRACK'?'ok':card.status==='AT_RISK'?'warn':card.status==='OFF_TRACK'?'err':'neu';
+                              const fmtVal = (v: any, fmt: string) => {
+                                if (v === null || v === undefined) return '—';
+                                if (fmt === 'currency') return '$' + fmt(v);
+                                if (fmt === 'percent')  return (v*100).toFixed(1) + '%';
+                                if (fmt === 'boolean')  return v >= 1 ? 'Yes' : 'No';
+                                return (v||0).toLocaleString();
+                              };
+                              const trendObj = kpiData.trends?.[card.id];
+                              const trendIcon = !trendObj ? '' : trendObj.direction==='up' ? ' ↑' : trendObj.direction==='down' ? ' ↓' : '';
+                              const trendColor = !trendObj ? '' : trendObj.direction==='up' ? (card.invert?'var(--danger)':'var(--au)') : trendObj.direction==='down' ? (card.invert?'var(--au)':'var(--danger)') : 'var(--tx-3)';
+                              return (
+                                <tr key={card.id}>
+                                  <td><span className="pill neu" style={{fontFamily:'monospace',fontSize:'.63rem'}}>{card.id}</span></td>
+                                  <td>
+                                    <div style={{fontWeight:600,fontSize:'.82rem'}}>{card.name}</div>
+                                    {trendObj && <div style={{fontSize:'.7rem',color:trendColor}}>{(trendObj.mom_pct*100)>=0?'+':''}{(trendObj.mom_pct*100).toFixed(1)}% MoM{trendIcon}</div>}
+                                  </td>
+                                  <td style={{fontWeight:700}}>
+                                    {card.actual===null?<span style={{color:'var(--tx-4)'}}>—</span>:
+                                      card.format==='currency'?<span>{'$'+fmt(card.actual)}</span>:
+                                      card.format==='percent'?<span>{(card.actual*100).toFixed(1)+'%'}</span>:
+                                      card.format==='boolean'?<span>{card.actual>=1?'✓':'✗'}</span>:
+                                      <span>{(card.actual||0).toLocaleString()}</span>}
+                                  </td>
+                                  <td style={{color:'var(--tx-3)'}}>
+                                    {card.target===null?<span style={{color:'var(--tx-4)'}}>—</span>:
+                                      card.format==='currency'?'$'+fmt(card.target):
+                                      card.format==='percent'?(card.target*100).toFixed(1)+'%':
+                                      (card.target||0).toLocaleString()}
+                                  </td>
+                                  <td>
+                                    {card.variance!==null && card.target!==null ? (
+                                      <span style={{color:statusColor,fontWeight:600}}>
+                                        {card.variance>=0?'+':''}
+                                        {card.format==='currency'?'$'+fmt(Math.abs(card.variance)):
+                                         card.format==='percent'?(card.variance_pct*100).toFixed(1)+'%':
+                                         Math.abs(card.variance).toLocaleString()}
+                                        {card.variance_pct!==null && <span style={{fontSize:'.7rem',marginLeft:4}}>({card.variance_pct>=0?'+':''}{(card.variance_pct*100).toFixed(1)}%)</span>}
+                                      </span>
+                                    ) : <span style={{color:'var(--tx-4)'}}>—</span>}
+                                  </td>
+                                  <td><span className={'pill ' + statusPill}>{card.status.replace('_',' ')}</span></td>
+                                  <td>
+                                    {kpiEditId===card.id ? (
+                                      <div className="d-flex gap-1">
+                                        <input className="form-control form-control-sm" type="number" style={{width:80}} value={kpiEditVal}
+                                          onChange={(e: ChangeEvent<HTMLInputElement>)=>setKpiEditVal(e.target.value)}/>
+                                        <button className="btn-x ok" style={{padding:'2px 8px',fontSize:'.72rem'}} onClick={saveKpiTarget}>✓</button>
+                                        <button className="btn-x sec" style={{padding:'2px 8px',fontSize:'.72rem'}} onClick={()=>setKpiEditId('')}>✕</button>
+                                      </div>
+                                    ) : (
+                                      <button className="btn-x sec" style={{padding:'3px 8px',fontSize:'.72rem'}}
+                                        onClick={()=>{setKpiEditId(card.id);setKpiEditVal(String(card.target??''));}}>
+                                        <i className="bi bi-pencil"/>
+                                      </button>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : !kpiLoading ? (
+                <div className="cs">
+                  <div className="empty-state">
+                    <i className="bi bi-speedometer2"/>
+                    <p className="es-title">No KPI data yet</p>
+                    <p>Add SC bookings and upload bank transactions to see your management scorecard.</p>
+                    <div className="d-flex gap-2 justify-content-center mt-3">
+                      <button className="btn-x pri" onClick={()=>go('sc')}><i className="bi bi-heart-pulse"/>Go to SilverConnect</button>
+                      <button className="btn-x sec" onClick={()=>go('bank')}><i className="bi bi-bank2"/>Upload Transactions</button>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Refresh button */}
+              <div className="d-flex justify-content-end mt-2">
+                <button className="btn-x sec" onClick={loadKPI} disabled={kpiLoading}>
+                  <i className="bi bi-arrow-clockwise"/>Refresh KPIs
+                </button>
+              </div>
             </div>
           )}
 
