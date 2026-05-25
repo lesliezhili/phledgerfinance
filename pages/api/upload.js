@@ -1,7 +1,7 @@
 import formidable from 'formidable';
 import fs from 'fs';
-import { parseCsv } from '../../../lib/csvIngestion.js';
-import { autoCategorise } from '../../../lib/categoriser.js';
+import { parseCsv } from '@/lib/csvIngestion.js';
+import { autoCategorise } from '@/lib/categoriser.js';
 import path from 'path';
 
 export const config = { api: { bodyParser: false } };
