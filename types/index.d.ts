@@ -233,3 +233,55 @@ export interface PlatformPL {
   booking_counts:           { completed: number; cancelled: number; pending: number; total: number };
   effective_fee_rate:       number;
 }
+
+// ─── KPI Management Reporting Types ────────────────────
+
+export type KPIStatus = 'ON_TRACK' | 'AT_RISK' | 'OFF_TRACK' | 'NO_TARGET' | 'NO_DATA';
+export type KPIFormat = 'number' | 'currency' | 'percent' | 'boolean';
+export type TrendDirection = 'up' | 'down' | 'flat';
+
+export interface KPIDefinition {
+  id:             string;
+  name:           string;
+  category:       string;
+  format:         KPIFormat;
+  invert:         boolean;
+  thresholds:     [number, number];
+  default_target: number | null;
+}
+
+export interface KPICard extends KPIDefinition {
+  actual:       number | null;
+  target:       number | null;
+  variance:     number | null;
+  variance_pct: number | null;
+  status: KPIStatus;
+}
+
+export interface KPITrend {
+  kpi_id:    string;
+  direction: TrendDirection;
+  mom_pct:   number;
+  ytd_total: number;
+  current:   number;
+  previous:  number;
+  data:      { period: string; value: number }[];
+}
+
+export interface KPISummary {
+  total: number; on_track: number; at_risk: number;
+  off_track: number; no_target: number; no_data: number;
+}
+
+export interface KPIScorecard {
+  cards:       KPICard[];
+  by_category: Record<string, KPICard[]>;
+  summary:     KPISummary;
+  generated_at: string;
+}
+
+export interface KPIDashboard {
+  scorecard: KPIScorecard;
+  trends: Record<string, KPITrend>;
+  period: string;
+}
