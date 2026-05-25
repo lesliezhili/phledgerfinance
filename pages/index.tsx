@@ -22,12 +22,12 @@ import Script from 'next/script';
 const PAGE_TITLES = {
   dash:'Dashboard', tx:'Transactions', bank:'Banking',
   bas:'BAS & GST', tax:'Tax Estimates', fin:'Financial Statements',
-  chat:'AI Assistant', mig:'Migration', sc:'SilverConnect'
+  chat:'AI Assistant', mig:'Migration', sc:'SilverConnect', kpi:'KPI Report'
 };
 const PAGE_SUBS = {
   dash:'Financial overview', tx:'All imported transactions', bank:'Upload bank CSV exports',
   bas:'AU BAS & CA GST/HST', tax:'AU & CA tax estimates', fin:'P&L · Balance Sheet · Cash Flow',
-  chat:'Ask questions about your finances', mig:'Import historical data', sc:'Platform bookkeeping · Provider payouts · Refunds'
+  chat:'Ask questions about your finances', mig:'Import historical data', sc:'Platform bookkeeping · Provider payouts · Refunds', kpi:'Management scorecard · Target vs Actual · Trends'
 };
 const CAT_COLORS = {
   '200':'#D1FAE5,#065F46','201':'#D1FAE5,#065F46','202':'#DCFCE7,#166534',
@@ -68,6 +68,13 @@ export default function PHLedger() {
   const [migR, setMigR]         = useState(false);
   const [toast, setToast]       = useState<any>({show:false,msg:'',ty:'success'});
   const [dragAU, setDragAU]     = useState(false);
+  const [kpiData, setKpiData]       = useState<any>({});
+  const [kpiTargets, setKpiTargets] = useState<any>({});
+  const [kpiCat, setKpiCat]         = useState<any[]>([]);
+  const [kpiLoading, setKpiLoading] = useState(false);
+  const [kpiEditId, setKpiEditId]   = useState('');
+  const [kpiEditVal, setKpiEditVal] = useState('');
+
   const [scConfig, setScConfig] = useState<any>({platform_fee_rate:0.15,provider_rate:0.85,upstream_synced:false});
   const [scBookings, setScBookings] = useState<any[]>([]);
   const [scPl, setScPl] = useState<any>({});
@@ -224,6 +231,29 @@ export default function PHLedger() {
     setScSyncing(false);
   }
 
+  async function loadKPI() {
+    setKpiLoading(true);
+    try {
+      const [rpt, tgt] = await Promise.all([
+        fetch('/api/kpi/report').then(r => r.json()),
+        fetch('/api/kpi/targets').then(r => r.json()),
+      ]);
+      setKpiData(rpt);
+      setKpiTargets(tgt.targets || {});
+      setKpiCat(tgt.catalogue  || []);
+    } catch {}
+    setKpiLoading(false);
+  }
+  async function saveKpiTarget() {
+    if (!kpiEditId || kpiEditVal === '') return;
+    try {
+      const r = await fetch('/api/kpi/targets', {method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ [kpiEditId]: parseFloat(kpiEditVal) })});
+      if (r.ok) { setKpiEditId(''); setKpiEditVal(''); await loadKPI(); showToast('Target updated','success'); }
+    } catch { showToast('Target save failed','danger'); }
+  }
+
   async function go(p) {
     setPg(p);
     if (p==='tx')   loadTx();
@@ -232,6 +262,7 @@ export default function PHLedger() {
     if (p==='fin')  loadFin();
     if (p==='mig')  { try { setMigD(await api('/api/migrate')); } catch {} }
     if (p==='sc')   loadSC();
+    if (p==='kpi')  loadKPI();
   }
 
   async function refresh() { await loadAn(); await loadTx(); }
@@ -320,7 +351,7 @@ export default function PHLedger() {
             </a>
           ))}
           <div className="nav-lbl">Reports</div>
-          {[['bas','file-earmark-text','BAS / GST'],['tax','receipt','Tax Estimates'],['fin','bar-chart-line','Financials']].map(([p,ic,lb])=>(
+          {[['bas','file-earmark-text','BAS / GST'],['tax','receipt','Tax Estimates'],['fin','bar-chart-line','Financials'],['kpi','speedometer2','KPI Report']].map(([p,ic,lb])=>(
             <a key={p} href="#" className={pg===p?'active':''} onClick={e=>{e.preventDefault();go(p);}}>
               <i className={`bi bi-${ic}`}/>{lb}
             </a>
