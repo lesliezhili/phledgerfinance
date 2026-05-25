@@ -45,7 +45,7 @@ export async function upsertTransactions(txs: Transaction[]): Promise<number> {
   let count = 0;
   for (let i = 0; i < txs.length; i += BATCH_SIZE) {
     const batch = txs.slice(i, i + BATCH_SIZE);
-    await client.from('transactions').upsert(batch);
+    await client.from('transactions').upsert(batch as any);
     count += batch.length;
   }
   return count;
