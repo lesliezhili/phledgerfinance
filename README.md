@@ -1,77 +1,128 @@
-# PHLedger
+# PHLedger + Tax
 
-**Free open-source bookkeeping for Australian and Canadian small businesses.**
+**Free open-source bookkeeping, payments & tax engine for AU/CA marketplace platforms.**
 
 [![CI/CD](https://github.com/lesliezhili/phledgertax/actions/workflows/ci.yml/badge.svg)](https://github.com/lesliezhili/phledgertax/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## Features
+## 🚀 What Is This?
 
-- Import CSV exports from **9 banks**: ANZ, NAB, CBA, Westpac (AU) · RBC, TD, BMO, Scotiabank, CIBC (CA)
-- Auto-categorisation with 26-account Chart of Accounts and 16 keyword rules
-- **AU**: BAS drafts (G1/G11/1A/1B), quarterly BAS, company & personal tax estimates (Stage 3 2024-25)
-- **CA**: GST/HST quarterly & annual, corporate & personal tax (2024 brackets + BPA credit)
-- Financial statements: P&L, Balance Sheet, Cash Flow
-- AI assistant chat interface
-- Optional Supabase cloud backend (runs fully local/offline without it)
+An open-source alternative to Stripe + Xero for marketplace platforms (like SilverConnect). Self-hosted, AU/CA tax-compliant, zero payment processing fees on bank-rail transactions.
 
-## Tech Stack
+## 📦 Modules
 
-| Layer | Tech |
-|---|---|
-| Framework | Next.js 14 (App Router) |
-| Language | JavaScript + TypeScript types |
-| UI | React 18 + Bootstrap 5.3 + Chart.js 4 |
-| API | Next.js API Routes (serverless) |
-| Storage | CSV files (local) or Supabase (cloud) |
-| Deploy | Vercel (free tier) |
+| Module | Description | Status |
+|--------|-------------|--------|
+| **Bookkeeping** | CSV import from 9 banks, auto-categorisation, Chart of Accounts | ✅ Live |
+| **BAS/Tax** | AU BAS drafts (G1/G11/1A/1B), CA GST filing | ✅ Live |
+| **Payments Engine** | Marketplace split payments, escrow, provider payouts | 🚧 New |
+| **Xero Connector** | OAuth 2.0, invoice sync, BAS data push | 🚧 New |
+| **PayTo (AU)** | NPP real-time payments via PayTo mandates | 📋 Planned |
+| **Interac (CA)** | Interac e-Transfer integration | 📋 Planned |
 
-## Quick Start
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│                 Your Platform                     │
+│          (e.g., SilverConnect Global)            │
+├─────────────────────────────────────────────────┤
+│                                                   │
+│  lib/payments/engine.ts  ←── Split payment logic  │
+│  connectors/xero/        ←── Xero 2-way sync     │
+│  lib/basAu.js            ←── AU BAS generation    │
+│  lib/taxCa.js            ←── CA GST filing        │
+│  lib/csvIngestion.js     ←── Bank CSV import      │
+│                                                   │
+├─────────────────────────────────────────────────┤
+│  Payment Rails                                    │
+│  ├── PayTo (AU NPP) — $0 fee, real-time          │
+│  ├── BECS Direct Debit — $0.30/tx                 │
+│  ├── Interac e-Transfer (CA) — $0 fee             │
+│  └── Stripe (fallback for cards) — 1.7%+30c      │
+└─────────────────────────────────────────────────┘
+```
+
+## 💰 Payments Engine
+
+```typescript
+import { createSplitPayment, DEFAULT_AU_CONFIG } from "./lib/payments/engine";
+
+// Customer pays $100 for a service
+const payment = createSplitPayment("ORDER-001", 100, {
+  ...DEFAULT_AU_CONFIG,
+  platformFeePercent: 15, // You keep 15%
+});
+
+// Result:
+// payment.customerAmount = $100
+// payment.platformFee = $15
+// payment.platformGst = $1.50 (GST on your fee)
+// payment.providerPayout = $85
+// payment.status = "pending" → "in_escrow" → "released"
+```
+
+## 🔗 Xero Integration
+
+```typescript
+import { getXeroAuthUrl, createXeroInvoice } from "./connectors/xero";
+
+// 1. Redirect user to Xero OAuth
+const authUrl = getXeroAuthUrl(config, "random-state");
+
+// 2. After callback, create invoice
+const result = await createXeroInvoice(invoice, tokens);
+```
+
+## 🇦🇺 AU Tax (BAS)
+
+- Auto-calculates G1, G11, 1A, 1B fields
+- Quarterly BAS draft generation
+- GST-inclusive / GST-exclusive handling
+- ABN validation
+
+## 🇨🇦 CA Tax (GST/HST)
+
+- Federal GST (5%) + Provincial HST where applicable
+- Input Tax Credit (ITC) tracking
+- GST/HST filing periods
+
+## 🏦 Supported Banks (CSV Import)
+
+**Australia:** ANZ, NAB, CBA, Westpac
+**Canada:** RBC, TD, BMO, Scotiabank, CIBC
+
+## 🛠️ Setup
 
 ```bash
-# Install
+git clone https://github.com/lesliezhili/phledgertax.git
+cd phledgertax
 npm install
-
-# Run locally
+cp .env.example .env.local
 npm run dev
-# → http://localhost:3000
-
-# Type-check
-npm run type-check
-
-# Lint
-npm run lint
-
-# Build for production
-npm run build
 ```
 
-## Environment Variables (optional — for Supabase cloud mode)
+### Environment Variables
 
-Create `.env.local`:
+```env
+# Xero OAuth (get from https://developer.xero.com)
+XERO_CLIENT_ID=
+XERO_CLIENT_SECRET=
+XERO_REDIRECT_URI=http://localhost:3000/api/xero/callback
 
-```
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your-service-role-key
-BANK_DATA_PATH=/custom/path/to/bank_data   # optional override
-```
+# Supabase (for storage)
+NEXT_PUBLIC_SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
 
-Without these, PHLedger runs in **local CSV mode** using `./bank_data/` directory.
-
-## Bank Data Structure
-
-```
-bank_data/
-  anz/2025/07/transactions.csv
-  rbc/2025/10/transactions.csv
-  ...
+# Stripe (fallback for card payments)
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
 ```
 
-Place exported CSVs in the appropriate `bank/year/month/` folder, then use **Banking → Upload** in the UI.
+## 📄 License
 
-## Deployment
+MIT — Free for personal and commercial use.
 
-Push to `main` → Vercel auto-deploys. CI runs lint + build on every push/PR.
+## 🙏 Foundation
 
-## License
-
-MIT — free forever.
+Built with love. God / Jesus / Spirit.
