@@ -200,6 +200,11 @@ const fr: Translations = {
   refund_title: 'Remboursement', refund_amount: 'Montant du remboursement', refund_reason: 'Motif', refund_status: 'Statut', refund_date: 'Date', refund_original_payment: 'Paiement original', refund_full: 'Remboursement intégral', refund_partial: 'Remboursement partiel', refund_approved: 'Approuvé', refund_rejected: 'Refusé', refund_pending: 'En attente', refund_processed: 'Traité', refund_request: 'Demander un remboursement', refund_policy: 'Politique de remboursement',
   report_title: 'Rapports', report_pnl: 'Compte de résultat', report_balance_sheet: 'Bilan', report_bas: "Déclaration d'activité", report_tax_return: 'Déclaration fiscale', report_cash_flow: 'Flux de trésorerie', report_revenue: 'Chiffre d\'affaires', report_expenses: 'Charges', report_net_profit: 'Bénéfice net', report_net_loss: 'Perte nette', report_period: 'Période', report_ytd: 'Cumul annuel', report_quarterly: 'Trimestriel', report_annual: 'Annuel', report_export: 'Exporter', report_gst_collected: 'GST collectée', report_gst_paid: 'GST payée', report_gst_net: 'GST nette à payer',
   common_save: 'Enregistrer', common_cancel: 'Annuler', common_edit: 'Modifier', common_delete: 'Supprimer', common_search: 'Rechercher', common_filter: 'Filtrer', common_sort: 'Trier', common_loading: 'Chargement...', common_error: 'Erreur', common_success: 'Succès', common_confirm: 'Confirmer', common_back: 'Retour', common_next: 'Suivant', common_total: 'Total', common_date: 'Date', common_status: 'Statut', common_actions: 'Actions', common_no_data: 'Aucune donnée', common_powered_by: 'Propulsé par PHLedger',
+
+  invoice_date: 'Date de facture',
+  invoice_due_date: 'Date d\'\u00e9ch\u00e9ance',
+  nav_sign_up: 'S\'inscrire',
+  report_bas: 'D\u00e9claration BAS / TPS',
 };
 
 export const TRANSLATIONS: Record<Locale, Translations> = { en, 'zh-CN': zhCN, 'zh-TW': zhTW, ja, ko, es, fr };

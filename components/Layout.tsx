@@ -30,12 +30,12 @@ export default function Layout({ children }: { children: ReactNode }) {
     // Check saved preferences
     const c = localStorage.getItem('ph_country');
     if (c) setCountry(c);
-    const l = localStorage.getItem('ph_lang');
+    const l = localStorage.getItem('ph_locale');
     if (l) setLang(l);
   }, []);
 
   const handleCountry = (c: string) => { setCountry(c); localStorage.setItem('ph_country', c); };
-  const handleLang = (l: string) => { setLang(l); localStorage.setItem('ph_lang', l); window.location.reload(); };
+  const handleLang = (l: string) => { setLang(l); localStorage.setItem('ph_locale', l); window.location.reload(); };
   const handleSignOut = () => { localStorage.removeItem('ph_user'); localStorage.removeItem('ph_token'); window.location.href = '/auth/signin'; };
 
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
