@@ -1,3 +1,4 @@
+import Layout from '../components/Layout';
 import type { ChangeEvent, DragEvent, KeyboardEvent, FC } from 'react';
 import type {
   Transaction, AnalyticsResult, BASDraft, QuarterlyBAS,
@@ -339,6 +340,7 @@ export default function PHLedger() {
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
       </Head>
       <Script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" strategy="afterInteractive"/>
+      <Layout>
 
       {/* SIDEBAR */}
       <nav className="sidebar">
@@ -1106,6 +1108,7 @@ export default function PHLedger() {
           </div>
         </div>
       )}
+          </Layout>
     </>
   );
 }
