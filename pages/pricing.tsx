@@ -1,6 +1,6 @@
 import{useState}from'react';import Head from'next/head';
 const plans=[
-{id:'free',name:'Free',aud:0,cad:0,features:['Finance Agent (NL chat)','1 bank account','BAS generation','Annual tax return draft','500 transactions/month','Email support'],cta:'Get Started'},
+{id:'free',name:'Free',aud:0,cad:0,features:['PHLedger & SilverConnect internal only','Full platform access','Unlimited transactions','All payment rails','Priority support','Internal use license'],cta:'Internal Only'},
 {id:'starter',name:'Starter',aud:29,cad:25,features:['Everything in Free, plus:','Unlimited bank accounts','5,000 transactions/month','PayTo payments (AU, $0/tx)','Interac payments (CA, $0.25/tx)','Auto-categorisation','P&L + Balance Sheet','Priority support'],cta:'Start Free Trial'},
 {id:'professional',name:'Professional',aud:79,cad:69,rec:true,features:['Everything in Starter, plus:','Unlimited transactions','Multi-entity (AU + CA)','Auto-reconciliation','Cash flow forecasting','BAS auto-lodge','API access','Audit trail','Phone + chat support'],cta:'Start Free Trial'},
 {id:'enterprise',name:'Enterprise',aud:199,cad:179,features:['Everything in Professional, plus:','Unlimited entities','Custom rules engine','Multi-user + team roles','SSO (SAML/OIDC)','Dedicated support manager','Custom integrations','99.9% SLA','On-premise available'],cta:'Contact Sales'},
@@ -15,7 +15,7 @@ return(<><Head><title>Pricing — PHLedger</title></Head>
 <a href="/auth/signup" style={{fontSize:'.8rem',padding:'6px 14px',background:'#059669',color:'white',borderRadius:6,textDecoration:'none'}}>Sign Up Free</a></div></header>
 <div style={{textAlign:'center',padding:'40px 20px 20px'}}>
 <h1 style={{fontSize:'2rem',color:'#1e3a5f',margin:0}}>Simple, transparent pricing</h1>
-<p style={{color:'#6b7280',margin:'8px 0 20px',fontSize:'.95rem'}}>100% free to start. No credit card required. Cancel anytime.</p>
+<p style={{color:'#6b7280',margin:'8px 0 20px',fontSize:'.95rem'}}>Intelligent finance for Australian & Canadian businesses. 14-day free trial.</p>
 <div style={{display:'flex',gap:12,justifyContent:'center',alignItems:'center',marginBottom:24}}>
 <div style={{display:'flex',gap:4,background:'#e5e7eb',borderRadius:6,padding:3}}>
 <button onClick={()=>setCur('AUD')} style={{padding:'4px 10px',borderRadius:4,border:'none',fontSize:'.75rem',fontWeight:600,cursor:'pointer',background:cur==='AUD'?'white':'transparent',color:cur==='AUD'?'#059669':'#6b7280'}}>AUD $</button>
@@ -32,5 +32,5 @@ return(<div key={p.id} style={{background:'white',borderRadius:12,padding:'24px 
 </div>)})}</div>
 <div style={{textAlign:'center',padding:'20px',borderTop:'1px solid #e5e7eb',background:'white'}}>
 <p style={{fontSize:'.75rem',color:'#6b7280',margin:0}}>All plans include: No setup fees | PayTo $0/tx (AU) | Interac $0.25/tx (CA) | Supabase hosted | ATO-ready BAS</p>
-<p style={{fontSize:'.7rem',color:'#9ca3af',marginTop:6}}>Payment via PayTo NPP (AU) or Interac e-Transfer (CA). No credit card needed for free plan.</p>
+<p style={{fontSize:'.7rem',color:'#9ca3af',marginTop:6}}>Payment via PayTo NPP (AU) or Interac e-Transfer (CA). Powered by PHLedger.</p>
 </div></div></>);}

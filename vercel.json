@@ -18,6 +18,10 @@
     {
       "source": "/plans",
       "destination": "/pricing"
+    },
+    {
+      "source": "/about-phledger",
+      "destination": "/about"
     }
   ],
   "headers": [

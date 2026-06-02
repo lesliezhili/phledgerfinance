@@ -41,9 +41,16 @@ function simpleHash(pw) {
 const LOCAL_USERS = new Map();
 LOCAL_USERS.set('zhili@phledger.com', { ...ADMIN, pwHash: simpleHash('Lz@77071517') });
 
+// Only PHLedger and SilverConnect get free plan
+function isFreeEligible(email) {
+  const domains = ['phledger.com', 'silverconnect.com.au', 'silverconnect.ca'];
+  const d = email.split('@')[1]?.toLowerCase();
+  return domains.includes(d);
+}
+
 export async function signUp(email, password, name, country = 'AU') {
   if (LOCAL_USERS.has(email)) return { error: 'Email already registered' };
-  const user = { id: 'usr-' + Date.now(), email, name, role: 'customer', plan: 'free', country, created_at: new Date().toISOString(), pwHash: simpleHash(password) };
+  const user = { id: 'usr-' + Date.now(), email, name, role: 'customer', plan: isFreeEligible(email) ? 'free' : 'trial', country, created_at: new Date().toISOString(), pwHash: simpleHash(password) };
   LOCAL_USERS.set(email, user);
   if (sb) await sb.from('users').upsert({ id: user.id, email, name, role: 'customer', plan: 'free', country });
   return { user: { ...user, pwHash: undefined } };

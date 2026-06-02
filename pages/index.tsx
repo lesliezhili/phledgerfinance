@@ -334,7 +334,7 @@ export default function PHLedger() {
   return (
     <>
       <Head>
-        <title>PHLedger — Free Bookkeeping for AU &amp; CA</title>
+        <title>PHLedger — Intelligent Finance Platform for AU &amp; CA</title>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
       </Head>
@@ -344,7 +344,7 @@ export default function PHLedger() {
       <nav className="sidebar">
         <div className="sb-logo">
           <div className="brand">PH<span>Ledger</span></div>
-          <div className="tag">Free bookkeeping · AU &amp; CA</div>
+          <div className="tag">Intelligent Finance · AU &amp; CA</div>
         </div>
         <div className="sb-nav mt-1">
           <div className="nav-lbl">Main</div>
@@ -372,7 +372,7 @@ export default function PHLedger() {
             </a>
           ))}
         </div>
-        <div className="sb-bot">
+        <div className="sb-bot"><div style={{fontSize:".55rem",color:"#9ca3af",marginBottom:4,textAlign:"center"}}><a href="/about" style={{color:"#6b7280",textDecoration:"none"}}>Powered by PHLedger</a></div>
           <div className="d-flex gap-2 flex-wrap align-items-center">
             <span className="sb-badge" style={{textTransform:'uppercase'}}>{health.backend||'csv'}</span>
             <span className="sb-badge" style={{color:health.status==='ok'?'#4ade80':'#f87171',letterSpacing:0}}>
