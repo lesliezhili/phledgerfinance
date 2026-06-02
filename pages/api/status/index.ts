@@ -7,6 +7,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   
   return res.status(200).json({
     service: "PHLedger Payment + Invoicing Platform",
+    branding: "Powered by PHLedger",
+    license: "Free for PHLedger & SilverConnect only. Commercial license required for others.",
     version: "1.0.0",
     status: "operational",
     replaces: ["Stripe ($2,000+/month for marketplace)", "Xero ($27-78/month)"],

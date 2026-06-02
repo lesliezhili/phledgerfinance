@@ -89,4 +89,7 @@ npm run dev       # Start API server (localhost:3000)
 
 ## License
 
-MIT — Free and open source forever.
+**PHLedger Free License** — Free for PHLedger & SilverConnect only.
+Commercial license required for all others. Contact: zhi.li@evolutionmining.com
+
+Branding: Must display "Powered by PHLedger" in UI.
