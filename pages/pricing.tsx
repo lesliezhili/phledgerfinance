@@ -1,6 +1,6 @@
 import{useState}from'react';import Head from'next/head';
 const plans=[
-{id:'free',name:'Free',aud:0,cad:0,features:['PHLedger & SilverConnect internal only','Full platform access','Unlimited transactions','All payment rails','Priority support','Internal use license'],cta:'Internal Only'},
+
 {id:'starter',name:'Starter',aud:29,cad:25,features:['Everything in Free, plus:','Unlimited bank accounts','5,000 transactions/month','PayTo payments (AU, $0/tx)','Interac payments (CA, $0.25/tx)','Auto-categorisation','P&L + Balance Sheet','Priority support'],cta:'Start Free Trial'},
 {id:'professional',name:'Professional',aud:79,cad:69,rec:true,features:['Everything in Starter, plus:','Unlimited transactions','Multi-entity (AU + CA)','Auto-reconciliation','Cash flow forecasting','BAS auto-lodge','API access','Audit trail','Phone + chat support'],cta:'Start Free Trial'},
 {id:'enterprise',name:'Enterprise',aud:199,cad:179,features:['Everything in Professional, plus:','Unlimited entities','Custom rules engine','Multi-user + team roles','SSO (SAML/OIDC)','Dedicated support manager','Custom integrations','99.9% SLA','On-premise available'],cta:'Contact Sales'},
