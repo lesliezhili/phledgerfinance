@@ -17,8 +17,8 @@ export default function Admin() {
     } else { router.push('/auth/signin'); }
   }, []);
 
-  if (loading) return <div style={{padding:40,textAlign:'center'}}>Loading...</div>;
-  if (!user) return null;
+  if (loading) return <Layout><div style={{padding:40,textAlign:'center'}}>Loading...</div></Layout>;
+  if (!user) return <Layout><div style={{padding:40,textAlign:'center'}}>Redirecting...</div></Layout>;
 
   return (<><Head><title>Admin — PHLedger</title></Head>
   <Layout>
