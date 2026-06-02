@@ -4,7 +4,7 @@ export default function Feedback(){const[msg,setMsg]=useState('');const[rating,s
 const submit=async(e)=>{e.preventDefault();await fetch('/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,rating,message:msg,category:cat})});setSent(true);};
 if(sent)return(<Layout><div style={{textAlign:'center'}}><h2 style={{color:'#059669'}}>Thank you!</h2><p style={{color:'#6b7280'}}>Your feedback helps us improve PHLedger.</p><a href="/" style={{color:'#059669'}}>Back to home</a></div></Layout>);
 return(<><Head><title>Feedback — PHLedger</title></Head>
-<div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'#f8fafc',fontFamily:'-apple-system,sans-serif'}}>
+<Layout><div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'#f8fafc',fontFamily:'-apple-system,sans-serif'}}>
 <div style={{background:'white',borderRadius:12,padding:'36px',boxShadow:'0 4px 24px rgba(0,0,0,.08)',width:'100%',maxWidth:440}}>
 <h2 style={{margin:'0 0 6px',color:'#1e3a5f'}}>Feedback</h2><p style={{color:'#6b7280',fontSize:'.83rem',margin:'0 0 20px'}}>Help us improve PHLedger. All feedback is read by the team.</p>
 <form onSubmit={submit}>
@@ -13,4 +13,4 @@ return(<><Head><title>Feedback — PHLedger</title></Head>
 <label style={{display:'block',marginBottom:10}}><span style={{fontSize:'.75rem',fontWeight:500}}>Email (optional)</span><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" style={{width:'100%',padding:8,border:'1px solid #d1d5db',borderRadius:5,marginTop:3,fontSize:'.83rem',boxSizing:'border-box'}}/></label>
 <label style={{display:'block',marginBottom:14}}><span style={{fontSize:'.75rem',fontWeight:500}}>Message</span><textarea value={msg} onChange={e=>setMsg(e.target.value)} required rows={4} placeholder="What can we improve?" style={{width:'100%',padding:8,border:'1px solid #d1d5db',borderRadius:5,marginTop:3,fontSize:'.83rem',resize:'vertical',boxSizing:'border-box'}}/></label>
 <button type="submit" style={{width:'100%',padding:10,background:'#059669',color:'white',border:'none',borderRadius:6,fontSize:'.85rem',fontWeight:600,cursor:'pointer'}}>Send Feedback</button>
-</form></div></div></>);}
+</form></div></div></Layout></>);}
