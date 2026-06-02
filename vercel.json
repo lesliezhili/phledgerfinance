@@ -6,6 +6,18 @@
     {
       "source": "/finance-agent",
       "destination": "/agent"
+    },
+    {
+      "source": "/login",
+      "destination": "/auth/signin"
+    },
+    {
+      "source": "/register",
+      "destination": "/auth/signup"
+    },
+    {
+      "source": "/plans",
+      "destination": "/pricing"
     }
   ]
 }
