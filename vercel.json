@@ -22,6 +22,14 @@
     {
       "source": "/about-phledger",
       "destination": "/about"
+    },
+    {
+      "source": "/book-service",
+      "destination": "/book"
+    },
+    {
+      "source": "/services",
+      "destination": "/book"
     }
   ],
   "headers": [
