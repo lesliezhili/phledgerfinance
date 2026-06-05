@@ -392,16 +392,33 @@ export default function PHLedger() {
             <div className="topbar-t">{PAGE_TITLES[pg]||'PHLedger'}</div>
             <div className="topbar-s">{PAGE_SUBS[pg]||''}</div>
           </div>
-          <div className="topbar-right">
-            <div className="btn-group btn-group-sm">
-              {[['AU','ct-au','🇦🇺'],['CA','ct-ca','🇨🇦'],['ALL','ct-all','🌐']].map(([c,cls,flag])=>(
-                <button key={c} className={`btn btn-outline-secondary${ctry===c?' '+cls:''}`}
-                  style={{fontSize:'.75rem',fontWeight:600,padding:'4px 10px'}}
-                  onClick={()=>{ setCtry(c); setTimeout(refresh,50); }}>
-                  {flag} {c}
-                </button>
-              ))}
-            </div>
+          <div className="topbar-right" style={{display:'flex',gap:10,alignItems:'center'}}>
+            {/* Country Select — SilverConnect style */}
+            <select value={ctry} onChange={e=>{setCtry(e.target.value);setTimeout(refresh,50);}} style={{
+              background:'white',border:'1px solid #d1d5db',borderRadius:8,padding:'6px 12px',fontSize:'.78rem',
+              fontWeight:600,color:'#1e3a5f',cursor:'pointer',minWidth:140,appearance:'none',
+              backgroundImage:'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'6\'%3E%3Cpath d=\'M0 0l5 6 5-6z\' fill=\'%236b7280\'/%3E%3C/svg%3E")',
+              backgroundRepeat:'no-repeat',backgroundPosition:'right 10px center',paddingRight:28
+            }}>
+              <option value="AU">🇦🇺 Australia</option>
+              <option value="CA">🇨🇦 Canada</option>
+              <option value="ALL">🌐 All Countries</option>
+            </select>
+            {/* Language Select — SilverConnect style */}
+            <select value={typeof window!=='undefined'?localStorage.getItem('ph_locale')||'en':'en'} onChange={e=>{localStorage.setItem('ph_locale',e.target.value);window.location.reload();}} style={{
+              background:'white',border:'1px solid #d1d5db',borderRadius:8,padding:'6px 12px',fontSize:'.78rem',
+              fontWeight:600,color:'#1e3a5f',cursor:'pointer',minWidth:130,appearance:'none',
+              backgroundImage:'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'6\'%3E%3Cpath d=\'M0 0l5 6 5-6z\' fill=\'%236b7280\'/%3E%3C/svg%3E")',
+              backgroundRepeat:'no-repeat',backgroundPosition:'right 10px center',paddingRight:28
+            }}>
+              <option value="en">🌐 English</option>
+              <option value="zh-CN">🇨🇳 简体中文</option>
+              <option value="zh-TW">🇹🇼 繁體中文</option>
+              <option value="ja">🇯🇵 日本語</option>
+              <option value="ko">🇰🇷 한국어</option>
+              <option value="es">🇪🇸 Español</option>
+              <option value="fr">🇫🇷 Français</option>
+            </select>
             <button className="btn-x pri" onClick={()=>go('bank')}>
               <i className="bi bi-upload"/>Upload CSV
             </button>
